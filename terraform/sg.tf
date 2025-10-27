@@ -27,6 +27,10 @@ resource "aws_security_group" "app_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  tags = {
+    Name = "${var.tags["Project"]}-app-sg"
+  }
+
 }
 
 resource "aws_security_group" "alb_sg" {
