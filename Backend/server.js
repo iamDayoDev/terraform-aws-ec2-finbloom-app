@@ -13,7 +13,7 @@ app.use("/api/transactions", transactionRoutes)
 
 const PORT = process.env.PORT || 5000
 
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
     res.send("FinBloom API is running...")
 })
 

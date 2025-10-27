@@ -1,4 +1,4 @@
-const API_URL = "http://inbloom.work.gd";
+const API_URL = "http://finbloom.work.gd";
  
 const state = {
     transactions: [],

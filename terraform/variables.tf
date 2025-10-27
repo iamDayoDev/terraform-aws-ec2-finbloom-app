@@ -23,7 +23,7 @@ variable "db_name" {
 variable "db_username" {
   description = "The database admin username"
   type        = string
-  default     = "admin"
+  default     = "finbloomadmin"
 }
 
 variable "db_password" {
