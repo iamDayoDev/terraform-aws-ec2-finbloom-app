@@ -6,7 +6,7 @@ variable "tags" {
   type = map(string)
   default = {
     Environment = "Dev"
-    Project     = "Finbloom"
+    Project     = "finbloom"
   }
 }
 
