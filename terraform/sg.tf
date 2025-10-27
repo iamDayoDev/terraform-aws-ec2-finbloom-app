@@ -68,9 +68,33 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group_rule" "allow_from_alb_to_app" {
   type                     = "ingress"
   from_port                = 5000 # APP_PORT
-  to_port                  = 80
+  to_port                  = 5000
   protocol                 = "tcp"
   security_group_id        = aws_security_group.app_sg.id
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
+resource "aws_security_group" "db_sg" {
+  name        = "${var.tags["Project"]}-db-sg"
+  description = "Database security group - allow MySQL from app servers"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  ingress {
+    description     = "Allow MySQL from app servers"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.tags["Project"]}-db-sg"
+  }
+}
