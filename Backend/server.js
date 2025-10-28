@@ -3,7 +3,6 @@ import cors from "cors"
 import dotenv from "dotenv"
 import transactionRoutes from "./routes/transactions.js"
 
-
 dotenv.config()
 
 const app = express()
@@ -12,6 +11,11 @@ app.use(express.json())
 app.use("/api/transactions", transactionRoutes)
 
 const PORT = process.env.PORT || 5000
+
+// Health check endpoint for ALB
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "healthy" })
+})
 
 app.get("/", (req, res) => {
     res.send("FinBloom API is running...")
