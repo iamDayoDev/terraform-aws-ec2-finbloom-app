@@ -5,7 +5,10 @@ dotenv.config()
 const { Pool } = pkg
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+    rejectUnauthorized: false, // allow AWS RDS self-signed cert
+  },
 })
 
 export default pool

@@ -41,7 +41,7 @@ resource "aws_alb_target_group" "backend_tg" {
   deregistration_delay = 30
 
   health_check {
-    path                = "/api/*"
+    path                = "/health"
     interval            = 15
     timeout             = 5
     healthy_threshold   = 2

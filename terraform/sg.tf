@@ -82,11 +82,11 @@ resource "aws_security_group" "alb_sg" {
 
 resource "aws_security_group" "db_sg" {
   name        = "${var.tags["Project"]}-db-sg"
-  description = "Database security group - allow MySQL from app servers"
+  description = "Database security group - allow PostgreSQL from app servers"
   vpc_id      = aws_vpc.main_vpc.id
 
   ingress {
-    description     = "Allow MySQL from app servers"
+    description     = "Allow PostgreSQL from app servers"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
