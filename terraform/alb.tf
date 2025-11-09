@@ -65,14 +65,19 @@ resource "aws_alb_listener" "frontend_app_lb_listener" {
   }
 }
 
-resource "aws_alb_listener" "backendapp_lb_listener" {
-  load_balancer_arn = aws_alb.app_lb.arn
-  port              = "5000"
-  protocol          = "HTTP"
+resource "aws_lb_listener_rule" "backend_rule" {
+  listener_arn = aws_alb_listener.frontend_app_lb_listener.arn
+  priority     = 10
 
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_alb_target_group.backend_tg.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/*"]
+    }
   }
 }
 
