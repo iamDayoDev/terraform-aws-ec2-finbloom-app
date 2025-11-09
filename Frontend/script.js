@@ -1,4 +1,4 @@
-const API_URL = "http://finbloom.work.gd";
+const API_URL = "http://finbloom-app-lb-1573587002.us-east-1.elb.amazonaws.com";
  
 const state = {
     transactions: [],

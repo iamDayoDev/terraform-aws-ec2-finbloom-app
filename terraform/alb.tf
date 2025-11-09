@@ -13,10 +13,10 @@ resource "aws_alb" "app_lb" {
 }
 
 resource "aws_alb_target_group" "frontend_tg" {
-  name     = "${var.tags["Project"]}-frontend-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
+  name                 = "${var.tags["Project"]}-frontend-tg"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.main_vpc.id
   deregistration_delay = 30
 
   health_check {
@@ -34,10 +34,10 @@ resource "aws_alb_target_group" "frontend_tg" {
 }
 
 resource "aws_alb_target_group" "backend_tg" {
-  name     = "${var.tags["Project"]}-backend-tg"
-  port     = 5000
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
+  name                 = "${var.tags["Project"]}-backend-tg"
+  port                 = 5000
+  protocol             = "HTTP"
+  vpc_id               = aws_vpc.main_vpc.id
   deregistration_delay = 30
 
   health_check {
@@ -78,13 +78,13 @@ resource "aws_alb_listener" "backendapp_lb_listener" {
 
 resource "aws_alb_target_group_attachment" "frontend_server_attachment" {
   target_group_arn = aws_alb_target_group.frontend_tg.arn
-  target_id        = aws_instance.app_server.id
+  target_id        = aws_instance.app_server[0].id
   port             = 80
 }
 
 resource "aws_alb_target_group_attachment" "backend_server_attachment" {
   target_group_arn = aws_alb_target_group.backend_tg.arn
-  target_id        = aws_instance.app_server.id
+  target_id        = aws_instance.app_server[1].id
   port             = 5000
 }
 

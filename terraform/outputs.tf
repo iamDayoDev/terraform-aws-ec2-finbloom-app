@@ -1,11 +1,11 @@
 output "app_server-1_public_ip" {
   description = "The public IP address of the first application server"
-  value       = aws_instance.app_server.public_ip
+  value       = aws_instance.app_server[0].public_ip
 }
 
 output "app_server-2_public_ip" {
   description = "The public IP address of the second application server"
-  value       = aws_instance.app_server_2.public_ip
+  value       = aws_instance.app_server[1].public_ip
 }
 
 output "alb_dns_name" {

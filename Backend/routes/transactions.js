@@ -25,11 +25,9 @@ router.post("/", async (req, res) => {
             [type, category, amount, description]
         )
 
-        res.json(result.rows[0])
-        res.status(201).json({
-            ...row,
-            date: row.created_at
-        })
+        const created = result.rows[0]
+        return res.status(201).json(created)
+
     } catch (err){
         console.error("POST /api/transactions error:", err);
         res.status(500).json({error: err.message})
