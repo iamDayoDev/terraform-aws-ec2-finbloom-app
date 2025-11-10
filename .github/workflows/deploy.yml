@@ -1,0 +1,51 @@
+# name: deploy apply
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'terraform/**'
+#       - '.github/workflows/deploy.yml'
+#   pull_request:
+#     branches:
+#       - main
+#     paths:
+#       - 'terraform/**'
+#       - '.github/workflows/deploy.yml'
+
+#   workflow_dispatch:
+
+# permissions:
+#   id-token: write   # This is required for requesting the JWT
+#   contents: read
+
+# jobs:
+#   deploy:
+#     name: 'Deploy to AWS'
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: 'Checkout GitHub Action'
+#         uses: actions/checkout@v3
+
+#       - name: 'Configure AWS Credentials'
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+
+#       - name: Test AWS Credentials
+#         run: aws sts get-caller-identity
+
+#         -name: 'EC2 SSH'
+#         uses: appleboy/ssh-action@v0.1.6
+#         with:
+#           host: ${{ secrets.EC2_HOST }}
+#           username: ${{ secrets.EC2_USER }}
+#           key: ${{ secrets.EC2_SSH_KEY }}
+#           script: |
+#             echo "Connected to EC2 instance"
+#             # Add your deployment commands here
+#             sudo systemctl restart myapp.service
+
