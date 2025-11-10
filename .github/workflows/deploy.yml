@@ -156,9 +156,7 @@ jobs:
             pm2 start server.js --name backend || echo "No existing PM2 processes"
           "
 
-      - name: Start Backend Service
-        run: |
-         - name: Apply database schema via SSH
+      - name: Apply database schema via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
             echo 'Applying database schema'
