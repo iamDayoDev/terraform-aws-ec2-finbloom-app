@@ -8,7 +8,7 @@ const state = {
     nextId: 1,
 }
 
-//Get transactions from backend
+//Get transactions from backendssss
 async function loadTransactions(){
     try {
         const res = await fetch(`${API_URL}/api/transactions`)
