@@ -1,0 +1,60 @@
+name: infra workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/infra.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/infra.yml'
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v3
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Test AWS Credentials
+        run: aws sts get-caller-identity
+
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+
+      - name: 'Terraform Init'
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: 'Terraform Plan'
+        working-directory: ./terraform
+        run: terraform plan
+
+      - name: 'Terraform Apply'
+        working-directory: ./terraform
+        run: terraform apply -auto-approve
+
+      - name: 'Terraform Destroy'
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: ./terraform
+        run: terraform destroy -auto-approve
+
+      - name: Summary
+        run: echo "### 🚀 Terraform Apply Completed" >> $GITHUB_STEP_SUMMARY
