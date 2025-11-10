@@ -37,8 +37,6 @@ jobs:
           echo "BACKEND_DIR=$REPO_DIR/Backend" >> $GITHUB_ENV
           echo "FRONTEND_DIR=$REPO_DIR/Frontend" >> $GITHUB_ENV
 
-
-    steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v3
 
