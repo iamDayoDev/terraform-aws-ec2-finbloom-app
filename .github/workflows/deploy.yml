@@ -71,7 +71,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
             echo "Cloning Project Repo"
              echo "Cloning application repository"
-            git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git app
+            git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git || echo "Repository already cloned"
             cd "${REPO_DIR}"
             "
            
