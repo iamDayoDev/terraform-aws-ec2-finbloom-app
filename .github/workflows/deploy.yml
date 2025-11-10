@@ -21,16 +21,22 @@ permissions:
   contents: read
 
 env:
-  HOME_DIR: /home/ubuntu
-  REPO_DIR: ~/terraform-aws-ec2-finbloom-app
-  BACKEND_DIR: ${{ env.REPO_DIR }}/Backend
-  FRONTEND_DIR: ${{ env.REPO_DIR }}/Frontend
+  REPO_DIR: /home/ubuntu/terraform-aws-ec2-finbloom-app
+  # BACKEND_DIR: ${{ env.REPO_DIR }}/Backend
+  # FRONTEND_DIR: ${{ env.REPO_DIR }}/Frontend
   
 
 jobs:
   deployFrontend:
     name: 'Deploy to AWS'
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Set derived paths
+        run: |
+          echo "BACKEND_DIR=$REPO_DIR/Backend" >> $GITHUB_ENV
+          echo "FRONTEND_DIR=$REPO_DIR/Frontend" >> $GITHUB_ENV
+
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -68,7 +74,7 @@ jobs:
             echo "Cloning Project Repo"
              echo "Cloning application repository"
             git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git app
-            cd ${REPO_DIR}
+            cd "${REPO_DIR}"
             EOF
            
 
@@ -76,7 +82,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
             echo "Configure Nginx for Frontend"
-            cd $HOME_DIR/${REPO_DIR}/FRONTEND_DIR
+            cd $FRONTEND_DIR
             echo "Configuring Nginx"
             sudo cp frontend.conf /etc/nginx/sites-available/frontend.conf
             sudo ln -s /etc/nginx/sites-available/frontend.conf /etc/nginx/sites-enabled/
@@ -91,7 +97,7 @@ jobs:
             echo "Configure Nginx for Frontend"
             echo "Copying application files to Nginx directory"
             sudo mkdir -p /var/www/html/finbloom
-            sudo cp -r $HOME_DIR/${REPO_DIR}/FRONTEND_DIR/* /var/www/html/finbloom/
+            sudo cp -r $FRONTEND _DIR/* /var/www/html/finbloom/
             sudo chown -R www-data:www-data /var/www/html/finbloom
             sudo chmod -R 755 /var/www/html/finbloom
             sudo nginx -t
