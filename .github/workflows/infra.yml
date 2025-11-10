@@ -15,6 +15,10 @@ on:
       - '.github/workflows/infra.yml'
   workflow_dispatch:
 
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read
+
 jobs:
   terraform:
     name: 'Terraform Apply'
