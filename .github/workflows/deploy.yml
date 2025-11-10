@@ -56,29 +56,29 @@ jobs:
 
       - name: SSH into EC2 and deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
             echo "Connected to EC2 instance"
             # Add your deployment commands here
             sudo apt update -y
             sudo apt install -y nginx
             sudo systemctl start nginx
             sudo systemctl enable nginx
-            EOF
+          "
 
 
       - name: 'Clone Project Repository'
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
             echo "Cloning Project Repo"
              echo "Cloning application repository"
             git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git app
             cd "${REPO_DIR}"
-            EOF
+            "
            
 
       - name: Configure Nginx Configure
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
             echo "Configure Nginx for Frontend"
             cd $FRONTEND_DIR
             echo "Configuring Nginx"
@@ -87,11 +87,11 @@ jobs:
             sudo rm /etc/nginx/sites-enabled/default
             sudo nginx -t
             sudo systemctl reload nginx
-            EOF
+            "
 
       - name: 'Copy Application Files'
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
             echo "Configure Nginx for Frontend"
             echo "Copying application files to Nginx directory"
             sudo mkdir -p /var/www/html/finbloom
@@ -100,7 +100,7 @@ jobs:
             sudo chmod -R 755 /var/www/html/finbloom
             sudo nginx -t
             sudo systemctl reload nginx
-            EOF
+            "
 
   # deployBackend:
   #   name: 'Deploy Backend Service'
