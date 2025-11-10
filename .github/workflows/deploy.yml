@@ -102,54 +102,73 @@ jobs:
             sudo systemctl reload nginx
             "
 
-  # deployBackend:
-  #   name: 'Deploy Backend Service'
-  #   runs-on: ubuntu-latest
+  deployBackend:
+    name: 'Deploy Backend Service'
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: 'Checkout GitHub Action'
-  #       uses: actions/checkout@v3
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v3
 
-  #     - name: 'Configure AWS Credentials'
-  #       uses: aws-actions/configure-aws-credentials@v2
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-  #     - name: Test AWS Credentials
-  #       run: aws sts get-caller-identity
+      - name: Test AWS Credentials
+        run: aws sts get-caller-identity
 
-  #     - name: 'Invoke Backend Service Deployment'
-  #       uses: appleboy/ssh-action@v0.1.6
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USER }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         script: |
-  #           echo "Starting backend service deployment"
-  #           sudo apt update -y
-  #           curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-  #           sudo apt install -y nodejs
-  #           # Verify Node.js installation
-  #           node -v
-  #           npm -v
-  #           # Install backend dependencies and start the service
-  #           sudo npm install -g pm2
-  #           sudo apt install postgresql-client -y
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > hng_devops.pem
+          chmod 600 hng_devops.pem
 
-  #           # Add your backend deployment commands here
-  #           cd $HOME_DIR/${REPO_DIR}/BACKEND_DIR
-  #           pm2 start server.js --name backend || echo "No existing PM2 processes"
+      - name: SSH into EC2 and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} "
+            echo "Starting backend service deployment"
+            sudo apt update -y
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt install -y nodejs
+            # Verify Node.js installation
+            node -v
+            npm -v
+            # Install backend dependencies and start the service
+            sudo npm install -g pm2
+            sudo apt install postgresql-client -y
+          "
 
-  #     - name: 'Apply DB Schema'
-  #       uses: appleboy/ssh-action@v0.1.6
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USER }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         script: |
-  #           echo "Applying database schema"
-  #           PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h ${{ secrets.DB_HOST }} -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -f $HOME_DIR/${REPO_DIR}/BACKEND_DIR/schema.sql || echo "Failed to apply DB schema"
+      - name: 'Clone Project Repository'
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
+            echo "Cloning Project Repo"
+             echo "Cloning application repository"
+            git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git || echo "Repository already cloned"
+            cd "${REPO_DIR}"
+            "
+
+      - name: Start Backend Service
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
+            echo "Starting backend service"
+            cd $BACKEND_DIR
+            pm2 start server.js --name backend || echo "No existing PM2 processes"
+          "
+
+      - name: Start Backend Service
+        run: |
+         - name: Apply database schema via SSH
+  run: |
+    ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
+      echo 'Applying database schema'
+      export PGPASSWORD='${{ secrets.DB_PASSWORD }}'
+      psql -h '${{ secrets.DB_HOST }}' -U '${{ secrets.DB_USER }}' -d '${{ secrets.DB_NAME }}' -f /home/ubuntu/terraform-aws-ec2-finbloom-app/Backend/schema.sql || echo '❌ Failed to apply DB schema'
+    "
+
+
+      - name: Summary
+        run: echo "### 🚀 Backend Server Deployment Completed" >> $GITHUB_STEP_SUMMARY
 
            
 
