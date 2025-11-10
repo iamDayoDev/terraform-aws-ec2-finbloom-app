@@ -20,11 +20,11 @@ permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read
 
-  env:
-    HOME_DIR: /home/ubuntu
-    REPO_DIR: ~/terraform-aws-ec2-finbloom-app
-    BACKEND_DIR: ${{ env.REPO_DIR }}/Backend
-    FRONTEND_DIR: ${{ env.REPO_DIR }}/Frontend
+env:
+  HOME_DIR: /home/ubuntu
+  REPO_DIR: ~/terraform-aws-ec2-finbloom-app
+  BACKEND_DIR: ${{ env.REPO_DIR }}/Backend
+  FRONTEND_DIR: ${{ env.REPO_DIR }}/Frontend
   
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
 
       - name: SSH into EC2 and deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
             echo "Connected to EC2 instance"
             # Add your deployment commands here
             sudo apt update -y
@@ -64,7 +64,7 @@ jobs:
 
       - name: 'Clone Project Repository'
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
             echo "Cloning Project Repo"
              echo "Cloning application repository"
             git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git app
@@ -74,7 +74,7 @@ jobs:
 
       - name: Configure Nginx Configure
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
             echo "Configure Nginx for Frontend"
             cd $HOME_DIR/${REPO_DIR}/FRONTEND_DIR
             echo "Configuring Nginx"
@@ -87,7 +87,7 @@ jobs:
 
       - name: 'Copy Application Files'
         run: |
-          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.FRONTEND_PUBLIC_IP }} << 'EOF'
             echo "Configure Nginx for Frontend"
             echo "Copying application files to Nginx directory"
             sudo mkdir -p /var/www/html/finbloom
