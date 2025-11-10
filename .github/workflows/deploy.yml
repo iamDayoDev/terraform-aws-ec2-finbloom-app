@@ -85,7 +85,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
             echo "Starting backend service"
-            cd $BACKEND_DIR
+            cd /home/ubuntu/terraform-aws-ec2-finbloom-app/Backend
             pm2 start server.js --name backend || echo "No existing PM2 processes"
           "
 
