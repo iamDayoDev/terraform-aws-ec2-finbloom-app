@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Terraform Apply'
+    name: 'Terraform Destroy'
     runs-on: ubuntu-latest
 
     steps:
@@ -32,9 +32,6 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-      - name: 'Terraform Init'
-        working-directory: ./terraform
-        run: terraform init
 
       - name: 'Terraform Plan'
         working-directory: ./terraform
