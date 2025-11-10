@@ -1,0 +1,49 @@
+name: infra workflow
+
+on:
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v3
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Test AWS Credentials
+        run: aws sts get-caller-identity
+
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+
+      - name: 'Terraform Init'
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: 'Terraform Plan'
+        working-directory: ./terraform
+        run: terraform plan
+
+      - name: 'Terraform Destroy'
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: ./terraform
+        run: terraform destroy -auto-approve
+
+      - name: Summary
+        run: echo "### 🚀 Terraform Destroy Completed" >> $GITHUB_STEP_SUMMARY
