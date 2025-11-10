@@ -1,51 +1,152 @@
-# name: deploy apply
+name: deploy apply
 
-# on:
-#   push:
-#     branches:
-#       - main
-#     paths:
-#       - 'terraform/**'
-#       - '.github/workflows/deploy.yml'
-#   pull_request:
-#     branches:
-#       - main
-#     paths:
-#       - 'terraform/**'
-#       - '.github/workflows/deploy.yml'
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/deploy.yml'
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# permissions:
-#   id-token: write   # This is required for requesting the JWT
-#   contents: read
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read
 
-# jobs:
-#   deploy:
-#     name: 'Deploy to AWS'
-#     runs-on: ubuntu-latest
+  env:
+    HOME_DIR: /home/ubuntu
+    REPO_DIR: ~/terraform-aws-ec2-finbloom-app
+    BACKEND_DIR: ${{ env.REPO_DIR }}/Backend
+    FRONTEND_DIR: ${{ env.REPO_DIR }}/Frontend
+  
 
-#     steps:
-#       - name: 'Checkout GitHub Action'
-#         uses: actions/checkout@v3
+jobs:
+  deployFrontend:
+    name: 'Deploy to AWS'
+    runs-on: ubuntu-latest
 
-#       - name: 'Configure AWS Credentials'
-#         uses: aws-actions/configure-aws-credentials@v2
-#         with:
-#           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
-#           aws-region: ${{ secrets.AWS_REGION }}
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v3
 
-#       - name: Test AWS Credentials
-#         run: aws sts get-caller-identity
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-#         -name: 'EC2 SSH'
-#         uses: appleboy/ssh-action@v0.1.6
-#         with:
-#           host: ${{ secrets.EC2_HOST }}
-#           username: ${{ secrets.EC2_USER }}
-#           key: ${{ secrets.EC2_SSH_KEY }}
-#           script: |
-#             echo "Connected to EC2 instance"
-#             # Add your deployment commands here
-#             sudo systemctl restart myapp.service
+      - name: Test AWS Credentials
+        run: aws sts get-caller-identity
 
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > hng_devops.pem
+          chmod 600 hng_devops.pem
+
+      - name: SSH into EC2 and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            echo "Connected to EC2 instance"
+            # Add your deployment commands here
+            sudo apt update -y
+            sudo apt install -y nginx
+            sudo systemctl start nginx
+            sudo systemctl enable nginx
+            EOF
+
+
+      - name: 'Clone Project Repository'
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            echo "Cloning Project Repo"
+             echo "Cloning application repository"
+            git clone https://github.com/iamDayoDev/terraform-aws-ec2-finbloom-app.git app
+            cd ${REPO_DIR}
+            EOF
+           
+
+      - name: Configure Nginx Configure
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            echo "Configure Nginx for Frontend"
+            cd $HOME_DIR/${REPO_DIR}/FRONTEND_DIR
+            echo "Configuring Nginx"
+            sudo cp frontend.conf /etc/nginx/sites-available/frontend.conf
+            sudo ln -s /etc/nginx/sites-available/frontend.conf /etc/nginx/sites-enabled/
+            sudo rm /etc/nginx/sites-enabled/default
+            sudo nginx -t
+            sudo systemctl reload nginx
+            EOF
+
+      - name: 'Copy Application Files'
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            echo "Configure Nginx for Frontend"
+            echo "Copying application files to Nginx directory"
+            sudo mkdir -p /var/www/html/finbloom
+            sudo cp -r $HOME_DIR/${REPO_DIR}/FRONTEND_DIR/* /var/www/html/finbloom/
+            sudo chown -R www-data:www-data /var/www/html/finbloom
+            sudo chmod -R 755 /var/www/html/finbloom
+            sudo nginx -t
+            sudo systemctl reload nginx
+            EOF
+
+  # deployBackend:
+  #   name: 'Deploy Backend Service'
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: 'Checkout GitHub Action'
+  #       uses: actions/checkout@v3
+
+  #     - name: 'Configure AWS Credentials'
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+  #         aws-region: ${{ secrets.AWS_REGION }}
+
+  #     - name: Test AWS Credentials
+  #       run: aws sts get-caller-identity
+
+  #     - name: 'Invoke Backend Service Deployment'
+  #       uses: appleboy/ssh-action@v0.1.6
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USER }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         script: |
+  #           echo "Starting backend service deployment"
+  #           sudo apt update -y
+  #           curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+  #           sudo apt install -y nodejs
+  #           # Verify Node.js installation
+  #           node -v
+  #           npm -v
+  #           # Install backend dependencies and start the service
+  #           sudo npm install -g pm2
+  #           sudo apt install postgresql-client -y
+
+  #           # Add your backend deployment commands here
+  #           cd $HOME_DIR/${REPO_DIR}/BACKEND_DIR
+  #           pm2 start server.js --name backend || echo "No existing PM2 processes"
+
+  #     - name: 'Apply DB Schema'
+  #       uses: appleboy/ssh-action@v0.1.6
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USER }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         script: |
+  #           echo "Applying database schema"
+  #           PGPASSWORD=${{ secrets.DB_PASSWORD }} psql -h ${{ secrets.DB_HOST }} -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_NAME }} -f $HOME_DIR/${REPO_DIR}/BACKEND_DIR/schema.sql || echo "Failed to apply DB schema"
+
+           
+
+  
