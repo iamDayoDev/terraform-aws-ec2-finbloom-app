@@ -169,6 +169,6 @@ jobs:
             "
 
       - name: Summary
-        run: echo "### 🚀 Nginx Configured Successfully" >> $GITHUB_STEP_SUMMARY  
+        run: echo "##### 🚀 Nginx Configured Successfully" >> $GITHUB_STEP_SUMMARY  
 
   
