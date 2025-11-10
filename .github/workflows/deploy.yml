@@ -159,12 +159,12 @@ jobs:
       - name: Start Backend Service
         run: |
          - name: Apply database schema via SSH
-  run: |
-    ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
-      echo 'Applying database schema'
-      export PGPASSWORD='${{ secrets.DB_PASSWORD }}'
-      psql -h '${{ secrets.DB_HOST }}' -U '${{ secrets.DB_USER }}' -d '${{ secrets.DB_NAME }}' -f /home/ubuntu/terraform-aws-ec2-finbloom-app/Backend/schema.sql || echo '❌ Failed to apply DB schema'
-    "
+        run: |
+          ssh -o StrictHostKeyChecking=no -i hng_devops.pem ubuntu@${{ secrets.BACKEND_PUBLIC_IP }} "
+            echo 'Applying database schema'
+            export PGPASSWORD='${{ secrets.DB_PASSWORD }}'
+            psql -h '${{ secrets.DB_HOST }}' -U '${{ secrets.DB_USER }}' -d '${{ secrets.DB_NAME }}' -f /home/ubuntu/terraform-aws-ec2-finbloom-app/Backend/schema.sql || echo '❌ Failed to apply DB schema'
+          "
 
 
       - name: Summary
