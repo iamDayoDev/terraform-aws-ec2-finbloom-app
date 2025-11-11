@@ -27,7 +27,7 @@ The project follows a **3-tier architecture**:
 
 3. **Database**  
    - **PostgreSQL** hosted in a **private subnet**.  
-   - Accessible only by the backend via a **bastion host** for secure administration.  
+   - Accessible only by the backend for secure administration.  
 
 ## Networking & Security  
 
@@ -47,31 +47,19 @@ The project follows a **3-tier architecture**:
   - **Listener Rules**:  
     - `/` → Forwards to **Frontend Target Group (port 80)**.  
     - `/api/*` → Forwards to **Backend Target Group (port 5000)**.  
-
-- **Encryption**:  
-  - Provisioned an **SSL/TLS certificate** with **AWS Certificate Manager (ACM)**.  
-  - Application accessible via **HTTPS** (`https://www.finbloom.work.gd`).  
-
-
-## Domain & DNS  
-- Domain registered via **Freedomain.one** (`www.finbloom.work.gd`).
-<img width="1349" height="340" alt="Screenshot 2025-09-14 210216" src="https://github.com/user-attachments/assets/141dfbf1-9323-4117-b272-4127ee690b22" />
-- CNAME record points to the **AWS Application Load Balancer DNS name**.  
-- (Alternative: Route 53 could be used for advanced DNS and security features).  
+  
 
 ## Deployment Steps  
 
 ### 1️ VPC & Networking  
 - Create a VPC with **public and private subnets** across 2 Availability Zones.  
 - Attach an **Internet Gateway** to allow internet access.  
-- Set up a **Bastion Host** for private subnet access.
 <img width="1348" height="469" alt="Screenshot 2025-09-13 185049" src="https://github.com/user-attachments/assets/b993dc9d-ff66-4640-b8d9-72d433cca7ff" />
 
 
 ### 2️ Database Layer (RDS in a Private Subnet)  
 - Launch **PostgreSQL** instance in the **private subnet**.  
-- Configure Security Group: allow inbound traffic only from the backend SG.  
-- Connect via **bastion host** for administration.  
+- Configure Security Group: allow inbound traffic only from the backend SG.   
 
 ### 3️ Backend Layer (Public Subnet)  
 - Launch an EC2 instance for the **Node.js backend**.
@@ -91,8 +79,8 @@ The project follows a **3-tier architecture**:
   <img width="1364" height="334" alt="Screenshot 2025-09-14 185359" src="https://github.com/user-attachments/assets/a5481238-6892-4a41-84d7-c13f005cac7f" />
 - Register respective EC2 instances.  
 - Configure **Listeners & Rules**:  
-  - HTTPS (443) → Forward `/` to Frontend TG.  
-  - HTTPS (443) → Forward `/api/*` to Backend TG.  
+  - HTTP → Forward `/` to Frontend TG.  
+  - HTTP → Forward `/api/*` to Backend TG.  
 
 ### 6️ Domain & SSL  
 - Request SSL certificate in **ACM** for your domain.
@@ -130,10 +118,6 @@ This project uses multiple AWS services, each with a specific **purpose** and **
   - Purpose: Stores transaction data securely.  
   - Impact: Protects business-critical data by ensuring it’s not publicly accessible.  
 
-- **Bastion Host:**  
-  - Purpose: Provides secure administrative access to private resources.  
-  - Impact: Prevents direct public access to databases, improving security posture.  
-
 - **Application Load Balancer (ALB):**  
   - Purpose: Distributes incoming traffic across multiple EC2 instances and routes requests based on path (`/` vs `/api/*`).  
   - Impact: Improves application availability, reduces latency, and ensures seamless scaling for business continuity.  
@@ -146,7 +130,7 @@ This project uses multiple AWS services, each with a specific **purpose** and **
   - Purpose: Application runs in **two Availability Zones**.  
   - Impact: Protects against single AZ failures, ensuring higher uptime and reliability.  
 
-- **DNS (Freenom / Route 53):**  
+- **DNS (Route 53):**  
   - Purpose: Maps human-readable domain names to the ALB endpoint.  
   - Impact: Gives the business a professional presence and improves brand accessibility.  
 
@@ -167,7 +151,6 @@ This project uses multiple AWS services, each with a specific **purpose** and **
   - VPC, EC2, Security Groups, Bastion Host  
   - Application Load Balancer (ALB)  
   - Certificate Manager (ACM)  
-  - Freenom (domain)  
 
 
 
