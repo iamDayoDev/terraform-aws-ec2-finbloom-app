@@ -1,4 +1,4 @@
-name: infra workflow
+name: infra apply
 
 on:
   # push:
