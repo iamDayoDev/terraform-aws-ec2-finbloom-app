@@ -1,4 +1,4 @@
-name: deploy apply
+name: deploy app
 
 on:
   push:
