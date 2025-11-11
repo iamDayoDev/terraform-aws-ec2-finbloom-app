@@ -149,7 +149,7 @@ jobs:
             cd $FRONTEND_DIR
             echo "Configuring Nginx"
             sudo cp frontend.conf /etc/nginx/sites-available/frontend.conf
-            sudo ln -s /etc/nginx/sites-available/frontend.conf /etc/nginx/sites-enabled/
+            sudo ln -s /etc/nginx/sites-available/frontend.conf /etc/nginx/sites-enabled/frontend.conf
             sudo rm /etc/nginx/sites-enabled/default
             sudo nginx -t
             sudo systemctl reload nginx
@@ -169,6 +169,6 @@ jobs:
             "
 
       - name: Summary
-        run: echo "##### 🚀 Nginx Configured Successfully" >> $GITHUB_STEP_SUMMARY  
+        run: echo "### 🚀 Nginx Configured Successfully" >> $GITHUB_STEP_SUMMARY  
 
   
