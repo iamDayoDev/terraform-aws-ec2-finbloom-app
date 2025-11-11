@@ -96,7 +96,7 @@ jobs:
 
   deployFrontend:
     needs: deployBackend
-    name: 'Deploy to AWS'
+    name: 'Deploy to Frontend Server'
     runs-on: ubuntu-latest
 
     steps:
