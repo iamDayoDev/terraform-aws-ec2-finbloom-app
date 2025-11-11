@@ -5,13 +5,15 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'Backend/**'
+      - 'Frontend/**'
       - '.github/workflows/deploy.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/**'
+      - 'Backend/**'
+      - 'Frontend/**'
       - '.github/workflows/deploy.yml'
 
   workflow_dispatch:
