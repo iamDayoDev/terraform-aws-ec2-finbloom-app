@@ -1,20 +1,20 @@
 name: deploy app
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Backend/**'
-      - 'Frontend/**'
-      - '.github/workflows/deploy.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'Backend/**'
-      - 'Frontend/**'
-      - '.github/workflows/deploy.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'Backend/**'
+  #     - 'Frontend/**'
+  #     - '.github/workflows/deploy.yml'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'Backend/**'
+  #     - 'Frontend/**'
+  #     - '.github/workflows/deploy.yml'
 
   workflow_dispatch:
 
